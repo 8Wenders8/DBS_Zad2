@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-gbrbr0erzt&!0h-2)x=eqkv6ibtuwxdy^yh%dge(i+tq^5c6i_
 DEBUG = False
 
 # TODO: digital ocean ip
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'fiit-dbs-xvolansky-app']
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
