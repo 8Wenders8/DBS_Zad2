@@ -43,7 +43,7 @@ def patches(request):
                 "FROM matches as m " \
                 "RIGHT JOIN (SELECT name as patch_version, extract(epoch FROM release_date)::integer as patch_start_date, " \
                 "LEAD(extract(epoch from release_date)::integer) over (order by id) patch_end_date from patches) as p on m.start_time " \
-                "BETWEEN p.patch_start_date and p.patch_end_date; "
+                "BETWEEN p.patch_start_date and p.patch_end_date WHERE m.id is not null; "
 
     cursor = connection.cursor()
     query_1 = cursor.execute(sql_query)
