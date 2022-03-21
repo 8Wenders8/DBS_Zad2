@@ -60,7 +60,7 @@ def patches(request):
             "patch_end_date": query[i][2],
             "matches": [{
                 "match_id": query[i][3],
-                "duration": str(query[i][4])
+                "duration": float(query[i][4])
             }]
         }
         result_data["patches"].append(patch_arr)
