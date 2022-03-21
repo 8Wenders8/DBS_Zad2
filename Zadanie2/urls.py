@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from myapp.views import abilities
+from myapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('v1/', include('myapp.urls')),
+    path('v2/patches', patches),
+    path('v2/players/<int:player_id>/game_exp/', game_exp),
+    path('v2/players/<int:player_id>/game_objectives/', game_objectives),
     path('v2/players/<int:player_id>/abilities/', abilities)
 ]
