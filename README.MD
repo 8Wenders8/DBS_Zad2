@@ -9,7 +9,7 @@ LEAD(extract(epoch from release_date)::integer) over (order by id) patch_end_dat
 BETWEEN p.patch_start_date and p.patch_end_date WHERE m.id is not null; 
 ```
 
-## 'v2/players/(player_id}/game_exp/'
+## 'v2/players/{player_id}/game_exp/'
 ```sql
 SELECT p.id as id, COALESCE(p.nick, 'unknown') as player_nick, heroes.localized_name as hero_localized_name,
 SUM(COALESCE(match_pd.xp_hero, 0) + COALESCE(match_pd.xp_creep, 0) + COALESCE(match_pd.xp_other, 0) + COALESCE(match_pd.xp_roshan, 0)) as experiences_gained,
@@ -45,7 +45,7 @@ order by match_id, count_obj DESC, subtype;
 
 ## 'v2/players/{player_id}/abilities/'
 ```sql
-SELECT p.id as id, COALESCE(p.nick, 'unknown') as player_nick,heroes.localized_name as hero_localized_name, abilities.name as name, " \
+SELECT p.id as id, COALESCE(p.nick, 'unknown') as player_nick,heroes.localized_name as hero_localized_name, abilities.name as name,
 MAX(ability_upgrades.level) as upgrade_level,
 COUNT(abilities.name) as count, matches_players_details.match_id
 FROM players p
