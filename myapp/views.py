@@ -114,7 +114,7 @@ def game_objectives(request, player_id):
     connection = connect()
 
     sql_query = " SELECT p.id as id, COALESCE(p.nick, 'unknown') as player_nick, heroes.localized_name as hero_localized_name, matches.id, " \
-                " COALESCE(game_objectives.subtype, 'NO ACTION') as subtype," \
+                " COALESCE(game_objectives.subtype, 'NO_ACTION') as subtype," \
                 " CASE WHEN COUNT(game_objectives.subtype) = 0 THEN 1 " \
                 " WHEN COUNT(game_objectives.subtype) != 0 THEN COUNT(game_objectives.subtype) " \
                 " END AS count_obj " \
