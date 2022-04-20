@@ -23,7 +23,7 @@ FROM players p
 JOIN matches_players_details as match_pd on p.id = match_pd.player_id
 JOIN heroes on match_pd.hero_id = heroes.id 
 JOIN matches on match_pd.match_id = matches.id 
-WHERE p.id = " + str(player_id) + " group by p.id, heroes.localized_name, matches.duration, matches.radiant_win, matches.id, match_pd.player_slot
+WHERE p.id = {player_id}  group by p.id, heroes.localized_name, matches.duration, matches.radiant_win, matches.id, match_pd.player_slot
 order by match_id;
 ```
 
@@ -39,7 +39,7 @@ JOIN matches_players_details on p.id = matches_players_details.player_id
 JOIN heroes on matches_players_details.hero_id = heroes.id 
 JOIN matches on matches_players_details.match_id = matches.id
 LEFT JOIN game_objectives on game_objectives.match_player_detail_id_1 = matches_players_details.id
-WHERE p.id = " + str(player_id) + " group by p.id, heroes.localized_name, game_objectives.subtype, matches.id, matches_players_details.match_id
+WHERE p.id = {player_id}  group by p.id, heroes.localized_name, game_objectives.subtype, matches.id, matches_players_details.match_id
 order by match_id, count_obj DESC, subtype;
 ```
 
@@ -53,6 +53,19 @@ JOIN matches_players_details on p.id = matches_players_details.player_id
 JOIN heroes on matches_players_details.hero_id = heroes.id 
 JOIN ability_upgrades on matches_players_details.id = ability_upgrades.match_player_detail_id
 JOIN abilities on ability_upgrades.ability_id = abilities.id
-WHERE p.id = " + str(player_id) + " group by p.id,heroes.localized_name,matches_players_details.match_id,abilities.name
+WHERE p.id = {player_id} group by p.id,heroes.localized_name,matches_players_details.match_id,abilities.name
 order by match_id, name, upgrade_level; 
+```
+
+## 'v3/matches/{match_id}/top_purchases/'
+```sql
+WITH bi AS (SELECT h.localized_name AS hero_name, i.name AS item_name, hero_id, item_id, match_id FROM purchase_logs AS pl
+NNER JOIN items AS i ON item_id = i.id 
+NNER JOIN matches_players_details AS mpd ON match_player_detail_id = mpd.id
+NNER JOIN heroes AS h ON mpd.hero_id = h.id
+NNER JOIN matches AS m ON mpd.match_id = m.id
+HERE m.id = {match_id} AND ((mpd.player_slot BETWEEN 0 AND 4 AND m.radiant_win = TRUE) OR (mpd.player_slot BETWEEN 128 AND 132 AND m.radiant_win = FALSE))),
+ci AS (SELECT DISTINCT bi.hero_id, bi.item_id, COUNT(bi.item_id) AS num, bi.match_id, bi.hero_name, bi.item_name FROM bi GROUP BY bi.item_id, bi.hero_id, bi.match_id, bi.hero_name, bi.item_name),
+top AS (SELECT ci.match_id, ci.hero_name, ci.item_name, row_number() over (PARTITION BY ci.hero_id ORDER BY ci.num DESC, ci.item_name ) row_num, ci.hero_id, ci.item_id, ci.num FROM ci ORDER BY ci.hero_id)
+SELECT top.match_id, top.hero_id, top.hero_name, top.item_id, top.item_name, top.num FROM top WHERE row_num BETWEEN 1 AND 5;
 ```
