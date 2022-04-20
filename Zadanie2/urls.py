@@ -23,5 +23,6 @@ urlpatterns = [
     path('v2/patches/', patches),
     path('v2/players/<int:player_id>/game_exp/', game_exp),
     path('v2/players/<int:player_id>/game_objectives/', game_objectives),
-    path('v2/players/<int:player_id>/abilities/', abilities)
+    path('v2/players/<int:player_id>/abilities/', abilities),
+    path('v3/matches/<int:match_id>/top_purchases/', matches)
 ]

@@ -207,3 +207,49 @@ def abilities(request, player_id):
         prev_id = query[i][6]
 
     return HttpResponse(json.dumps(result_data), content_type='application/json')
+
+
+def matches(request, match_id):
+    connection = connect()
+
+    sql_query = " WITH bi AS (SELECT h.localized_name AS hero_name, i.name AS item_name, hero_id, item_id, match_id FROM purchase_logs AS pl " \
+	            " INNER JOIN items AS i ON item_id = i.id " \
+	            " INNER JOIN matches_players_details AS mpd ON match_player_detail_id = mpd.id " \
+	            " INNER JOIN heroes AS h ON mpd.hero_id = h.id " \
+	            " INNER JOIN matches AS m ON mpd.match_id = m.id " \
+	            " WHERE m.id = " + str(match_id) + " AND ((mpd.player_slot BETWEEN 0 AND 4 AND m.radiant_win = TRUE) OR (mpd.player_slot BETWEEN 128 AND 132 AND m.radiant_win = FALSE))), " \
+                " ci AS (SELECT DISTINCT bi.hero_id, bi.item_id, COUNT(bi.item_id) AS num, bi.match_id, bi.hero_name, bi.item_name FROM bi GROUP BY bi.item_id, bi.hero_id, bi.match_id, bi.hero_name, bi.item_name), " \
+                " top AS (SELECT ci.match_id, ci.hero_name, ci.item_name, row_number() over (PARTITION BY ci.hero_id ORDER BY ci.num DESC, ci.item_name ) row_num, ci.hero_id, ci.item_id, ci.num FROM ci ORDER BY ci.hero_id) " \
+                " SELECT top.match_id, top.hero_id, top.hero_name, top.item_id, top.item_name, top.num FROM top WHERE row_num BETWEEN 1 AND 5; "
+
+    cursor = connection.cursor()
+    query_1 = cursor.execute(sql_query)
+    query = cursor.fetchall()
+
+    result_data = {"id": query[0][0],
+                   "heroes": []}
+    prev_id = -1
+
+    for i in range(len(query)):
+        if prev_id != query[i][1]:
+            heroes_arr = {
+                "id": query[i][1],
+                "name": query[i][2],
+                "top_purchases": [{
+                    "id":  query[i][3],
+                    "name": query[i][4],
+                    "count": query[i][5],
+                }]
+            }
+        if query[i - 1][1] != query[i][1]:
+            result_data["heroes"].append(heroes_arr)
+        elif prev_id == query[i][1]:
+            temp_arr = {
+                "id": query[i][3],
+                "name": query[i][4],
+                "count": query[i][5],
+            }
+            heroes_arr["top_purchases"].append(temp_arr)
+        prev_id = query[i][1]
+
+    return HttpResponse(json.dumps(result_data), content_type='application/json')
