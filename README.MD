@@ -69,3 +69,4 @@ ci AS (SELECT DISTINCT bi.hero_id, bi.item_id, COUNT(bi.item_id) AS num, bi.matc
 top AS (SELECT ci.match_id, ci.hero_name, ci.item_name, row_number() over (PARTITION BY ci.hero_id ORDER BY ci.num DESC, ci.item_name ) row_num, ci.hero_id, ci.item_id, ci.num FROM ci ORDER BY ci.hero_id)
 SELECT top.match_id, top.hero_id, top.hero_name, top.item_id, top.item_name, top.num FROM top WHERE row_num BETWEEN 1 AND 5;
 ```
+## v4 - Spravena len migracia

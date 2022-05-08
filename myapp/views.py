@@ -1,6 +1,6 @@
 from django.http import HttpResponse
-import psycopg2
 import json
+import psycopg2
 import environ
 
 
